@@ -1,4 +1,19 @@
 # -*- coding=utf-8 -*-
+# The APACHE License (APACHE)
+#
+# Copyright (c) 2022 Author. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from datetime import datetime
 import os
 import re
@@ -40,7 +55,7 @@ class Paje:
             return text.split("\n")
 
     def parse_text(self, data):
-# __import__('pprint').pprint(data)
+        # __import__('pprint').pprint(data)
         end_date = ""
         raw_salary = ""
         for item in data:
@@ -77,7 +92,7 @@ class Paje:
         for date, salary in sorted(
             self.data.items(),
             key=lambda item: item[1]["start_date"],
-            reverse=reverse
+            reverse=reverse,
         ):
             print("{}: {}".format(date, salary[salary_type]))
         print("---------------------------------")
