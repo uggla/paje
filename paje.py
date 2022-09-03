@@ -63,7 +63,7 @@ class Paje:
             },
         )
 
-    def display_salaries(self, type):
+    def display_salaries(self, type, reverse):
         sum = 0
         if type == "raw":
             salary_type = "raw_salary"
@@ -74,7 +74,11 @@ class Paje:
         else:
             assert False
 
-        for date, salary in self.data.items():
+        for date, salary in sorted(
+            self.data.items(),
+            key=lambda item: item[1]["start_date"],
+            reverse=reverse
+        ):
             print("{}: {}".format(date, salary[salary_type]))
         print("---------------------------------")
         print("Total {}: {}".format(type, sum))
@@ -97,5 +101,5 @@ class Paje:
         return net
 
 
-paje = Paje(dir, "2017")
-paje.display_salaries("net")
+paje = Paje(dir, r"20\d\d")
+paje.display_salaries("net", True)
