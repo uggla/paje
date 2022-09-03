@@ -40,6 +40,7 @@ class Paje:
             return text.split("\n")
 
     def parse_text(self, data):
+# __import__('pprint').pprint(data)
         end_date = ""
         raw_salary = ""
         for item in data:
@@ -50,7 +51,8 @@ class Paje:
                 raw_salary = float(item.split(" ")[-1].replace(",", "."))
             elif re.search(r"Salaire net \d+", item):
                 net_salary = float(item.split(" ")[2].replace(",", "."))
-
+            elif re.search(r"Salaire net déclaré \d+", item):
+                net_salary = float(item.split(" ")[-1].replace(",", "."))
         return (
             end_date.strftime("%m/%Y"),
             {
