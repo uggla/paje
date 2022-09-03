@@ -27,12 +27,12 @@ class Paje:
     def __init__(self, dir, filter=""):
         self.dir = dir
         self.data = {}
-        for pdf in sorted(self.search_pdf_file(filter)):
+        for pdf in sorted(self._search_pdf_files(filter)):
             print("Processing file: {}".format(pdf))
-            date, salary = self.parse_text(self.extract_text(pdf))
+            date, salary = self._parse_text(self._extract_text_from_pdf(pdf))
             self.data[date] = salary
 
-    def search_pdf_file(self, filter):
+    def _search_pdf_files(self, filter):
         pdf_files = []
         for root, dirs, files in os.walk(self.dir):
             for name in files:
@@ -41,7 +41,7 @@ class Paje:
                     pdf_files.append(pdf_file)
         return pdf_files
 
-    def extract_text(self, file):
+    def _extract_text_from_pdf(self, file):
         with open(file, "rb") as pdf_file:
 
             # creating a pdf reader object
@@ -54,7 +54,7 @@ class Paje:
             text = page.extractText()
             return text.split("\n")
 
-    def parse_text(self, data):
+    def _parse_text(self, data):
         # __import__('pprint').pprint(data)
         end_date = ""
         raw_salary = ""
@@ -99,7 +99,7 @@ class Paje:
         print("Total {}: {}".format(type, sum))
         print("Total {}/80: {}".format(type, sum / 80))
 
-    def sum_salaries(self):
+    def _sum_salaries(self):
         sum_raw = 0
         sum_net = 0
         for date, pay_sheet in self.data.items():
@@ -108,11 +108,11 @@ class Paje:
         return (sum_raw, sum_net)
 
     def sum_raw_salaries(self):
-        raw, net = self.sum_salaries()
+        raw, net = self._sum_salaries()
         return raw
 
     def sum_net_salaries(self):
-        raw, net = self.sum_salaries()
+        raw, net = self._sum_salaries()
         return net
 
 
