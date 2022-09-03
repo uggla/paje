@@ -5,17 +5,16 @@ import re
 
 import PyPDF2
 
-file = "/home/uggla/Documents/Perso/Nounou/2017/09.pdf"
 dir = "/home/uggla/Documents/Perso/Nounou"
 
 
-class Paje():
+class Paje:
     def __init__(self, dir, filter=""):
         self.dir = dir
         self.data = {}
         for pdf in sorted(self.search_pdf_file(filter)):
             print("Processing file: {}".format(pdf))
-            date, salary = self.get_date_and_raw_salary(self.extract_text(pdf))
+            date, salary = self.parse_text(self.extract_text(pdf))
             self.data[date] = salary
 
     def search_pdf_file(self, filter):
@@ -28,7 +27,7 @@ class Paje():
         return pdf_files
 
     def extract_text(self, file):
-        with open(file, 'rb') as pdf_file:
+        with open(file, "rb") as pdf_file:
 
             # creating a pdf reader object
             pdf_reader = PyPDF2.PdfFileReader(pdf_file)
@@ -38,34 +37,63 @@ class Paje():
 
             # extracting text from page
             text = page.extractText()
-
             return text.split("\n")
 
-    def get_date_and_raw_salary(self, data):
-        date = ''
-        salary = ''
+    def parse_text(self, data):
+        end_date = ""
+        raw_salary = ""
         for item in data:
             if "Période" in item:
-                date = datetime.strptime(item.split(" ")[-1], '%d/%m/%Y')
+                start_date = datetime.strptime(item.split(" ")[-3], "%d/%m/%Y")
+                end_date = datetime.strptime(item.split(" ")[-1], "%d/%m/%Y")
             elif "Salaire brut" in item:
-                salary = float(item.split(" ")[-1].replace(",", "."))
+                raw_salary = float(item.split(" ")[-1].replace(",", "."))
+            elif re.search(r"Salaire net \d+", item):
+                net_salary = float(item.split(" ")[2].replace(",", "."))
 
-        return (date, salary)
+        return (
+            end_date.strftime("%m/%Y"),
+            {
+                "raw_salary": raw_salary,
+                "net_salary": net_salary,
+                "start_date": start_date,
+                "end_date": end_date,
+            },
+        )
 
-    def display(self):
-        sum = self.sum_salaries()
+    def display_salaries(self, type):
+        sum = 0
+        if type == "raw":
+            salary_type = "raw_salary"
+            sum = self.sum_raw_salaries()
+        elif type == "net":
+            salary_type = "net_salary"
+            sum = self.sum_net_salaries()
+        else:
+            assert False
+
         for date, salary in self.data.items():
-            print("{}: {}".format(date.strftime("%Y-%m"), salary))
+            print("{}: {}".format(date, salary[salary_type]))
         print("---------------------------------")
-        print("Total raw: {}".format(sum))
-        print("Total raw/60: {}".format(sum/80))
+        print("Total {}: {}".format(type, sum))
+        print("Total {}/80: {}".format(type, sum / 80))
 
     def sum_salaries(self):
-        sum = 0
-        for date, salary in self.data.items():
-            sum += salary
-        return sum
+        sum_raw = 0
+        sum_net = 0
+        for date, pay_sheet in self.data.items():
+            sum_raw += pay_sheet["raw_salary"]
+            sum_net += pay_sheet["net_salary"]
+        return (sum_raw, sum_net)
+
+    def sum_raw_salaries(self):
+        raw, net = self.sum_salaries()
+        return raw
+
+    def sum_net_salaries(self):
+        raw, net = self.sum_salaries()
+        return net
 
 
 paje = Paje(dir, "2017")
-paje.display()
+paje.display_salaries("net")
