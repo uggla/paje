@@ -45,13 +45,13 @@ class Paje:
         with open(file, "rb") as pdf_file:
 
             # creating a pdf reader object
-            pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
 
             # creating a page object
-            page = pdf_reader.getPage(0)
+            page = pdf_reader.pages[0]
 
             # extracting text from page
-            text = page.extractText()
+            text = page.extract_text()
             return text.split("\n")
 
     def _parse_text(self, data):
